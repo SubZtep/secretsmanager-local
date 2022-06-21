@@ -1,0 +1,15 @@
+{
+  "name": "secretsmanager-local",
+  "description": "AWS Secrets Manager server mock",
+  "author": "Andras Serfozo <subztep@gmail.com>",
+  "repository": "github:SubZtep/secretsmanager-local",
+  "bugs": "https://github.com/SubZtep/secretsmanager-local/issues",
+  "license": "Unlicense",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "build": "docker build -t subztep/secretsmanager-local:0.1.0 .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
