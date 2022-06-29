@@ -7,25 +7,28 @@ if (!process.env.SECRET_STRING) {
 
 const port = process.env.SERVER_PORT || 7000
 
-const server = http.createServer((req, res) => {
-  log(req.url)
+const server = http.createServer(async (req, res) => {
+  const buffers = []
+  for await (const chunk of req) {
+    buffers.push(chunk)
+  }
+
+  const response = {
+    ARN: "xxx",
+    Name: process.env?.SECRET_NAME ?? "TestName",
+    VersionId: "x",
+    SecretString: process.env.SECRET_STRING,
+    VersionStages: ["x"],
+    CreatedDate: 0,
+  }
+
+  console.log(`${req.method} ${req.url}`, Buffer.concat(buffers).toString())
+  console.log("RESPONSE", response)
+
   res.writeHead(200, { "Content-Type": "application/json" })
-  res.end(
-    JSON.stringify({
-      ARN: "xxx",
-      Name: process.env?.SECRET_NAME ?? "TestName",
-      VersionId: "x",
-      SecretString: process.env.SECRET_STRING,
-      VersionStages: ["x"],
-      CreatedDate: 0,
-    })
-  )
+  res.end(JSON.stringify(response))
 })
 
 server.listen(port, () =>
-  console.log(`Secrets Manager local listening on port ${port}`)
+  console.log(`Secrets Manager is listening on port ${port}`)
 )
-
-function log(json) {
-  console.info("\x1b[36m%s\x1b[0m", "Request", JSON.stringify(json, null, 2))
-}
