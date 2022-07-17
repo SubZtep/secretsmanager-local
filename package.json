@@ -5,11 +5,11 @@
   "repository": "github:SubZtep/secretsmanager-local",
   "bugs": "https://github.com/SubZtep/secretsmanager-local/issues",
   "license": "Unlicense",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "build": "docker build -t subztep/secretsmanager-local:0.1.2 . && docker tag subztep/secretsmanager-local:0.1.2 subztep/secretsmanager-local:latest",
+    "build": "docker build -t subztep/secretsmanager-local:0.1.3 . && docker tag subztep/secretsmanager-local:0.1.3 subztep/secretsmanager-local:latest",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
