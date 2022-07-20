@@ -1,11 +1,11 @@
 FROM node:18-alpine
 
-ENV SERVER_PORT "7000"
+ENV SERVER_PORT 7000
 ENV HEALTHY_TIMEOUT 0
-ENV SECRET_NAME "TestKeyFromTheMock"
-ENV SECRET_STRING "{}"
-ENV SECRET_VERSION_ID "1.0"
-ENV SECRET_ARN "arn:aws:iam:mock"
+ENV SECRET_NAME TestKeyFromTheMock
+ENV SECRET_STRING {}
+ENV SECRET_VERSION_ID 1.0
+ENV SECRET_ARN arn:aws:iam:mock
 
 WORKDIR /home/node
 COPY --chown=node:node [".", "./"]

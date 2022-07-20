@@ -21,7 +21,7 @@ const server = createServer(async (req, res) => {
   res.end(JSON.stringify(response), () => {
     log(`RESPONSE ${statusCode}`, {
       ...response,
-      SecretString: `${SecretString.substring(0, 24)}...`,
+      SecretString: truncate(SecretString),
     })
   })
 })
@@ -38,6 +38,10 @@ process.on("SIGTERM", shutdown("SIGTERM"))
 /*#*
  ** Hoists
  */
+
+function truncate(str, limit = 24) {
+  return SecretString.length >= limit ? `${SecretString.substring(0, limit)}...` : SecretString
+}
 
 function log(message, ...optionalParams) {
   if (process.env.CONSOLE_OFF) return
@@ -57,6 +61,7 @@ async function generateResponse(req) {
   for await (const chunk of req) {
     buffers.push(chunk)
   }
+
   log(`${req.method} ${req.url}`, Buffer.concat(buffers).toString())
   log("REQUEST HEADERS", req.headers)
 
