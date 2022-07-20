@@ -62,6 +62,7 @@ async function generateResponse(req) {
     buffers.push(chunk)
   }
 
+  log(new Date().toISOString())
   log(`${req.method} ${req.url}`, Buffer.concat(buffers).toString())
   log("REQUEST HEADERS", req.headers)
 
@@ -71,7 +72,7 @@ async function generateResponse(req) {
     VersionId,
     SecretString,
     VersionStages: [VersionId],
-    CreatedDate: new Date().toISOString().split(".")[0],
+    CreatedDate: 0,
   }
 }
 
