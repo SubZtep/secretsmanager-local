@@ -1,62 +1,71 @@
 import { createServer } from "node:http"
 
 const {
-  SERVER_PORT = 7000,
-  SECRET_NAME: Name = "TestName",
+  SERVER_PORT,
+  SECRET_NAME: Name,
   SECRET_STRING: SecretString,
+  SECRET_VERSION_ID: VersionId,
+  SECRET_ARN: ARN,
 } = process.env
 
-if (!SecretString) {
-  console.error("Missing SECRET_STRING environment variable")
-  process.exit(1)
-}
+/*#*
+ ** Server
+ */
 
 const server = createServer(async (req, res) => {
-  const buffers = []
-  for await (const chunk of req) {
-    buffers.push(chunk)
-  }
-  console.log(formattedTime())
-  console.log(`${req.method} ${req.url}`, Buffer.concat(buffers).toString())
-  console.log("REQUEST HEADERS", req.headers)
-
-  const response = {
-    ARN: "xxx",
-    Name,
-    VersionId: "x",
-    SecretString,
-    VersionStages: ["x"],
-    CreatedDate: 0,
-  }
-  console.log("RESPONSE", {
-    ...response,
-    SecretString: `${SecretString.substring(0, 24)}...`,
-  })
-
+  const response = await generateResponse(req)
   res.writeHead(200, { "Content-Type": "application/json" })
-  res.end(JSON.stringify(response))
+  res.end(JSON.stringify(response), () => {
+    console.log("WERE", response)
+    log("RESPONSE", {
+      ...response,
+      SecretString: `${SecretString.substring(0, 24)}...`,
+    })
+  })
 })
 
-server.listen(SERVER_PORT, () =>
-  console.log(`Secrets Manager is listening on port ${SERVER_PORT}`)
-)
+server.listen(SERVER_PORT, () => log(`Secrets Manager is listening on port ${SERVER_PORT}`))
+
+/*#*
+ ** Signals for Docker
+ */
 
 process.on("SIGINT", shutdown("SIGINT"))
 process.on("SIGTERM", shutdown("SIGTERM"))
 
-function shutdown(name) {
-  return () => {
-    console.log(`${name} signal received`)
-    server.close(() => {
-      console.log("Server closed")
-      process.exit()
-    })
+/*#*
+ ** Hoists
+ */
+
+function log(message, ...optionalParams) {
+  if (process.env.CONSOLE_OFF) return
+  console.log(message, ...optionalParams)
+}
+
+async function generateResponse(req) {
+  const buffers = []
+  for await (const chunk of req) {
+    buffers.push(chunk)
+  }
+  log(`${req.method} ${req.url}`, Buffer.concat(buffers).toString())
+  log("REQUEST HEADERS", req.headers)
+
+  return {
+    ARN,
+    Name,
+    VersionId,
+    SecretString,
+    VersionStages: [VersionId],
+    CreatedDate: new Date().toISOString().split(".")[0],
   }
 }
 
-function formattedTime() {
-  const dt = new Date()
-  return new Date(dt.getTime() - dt.getTimezoneOffset() * 60_000)
-    .toISOString()
-    .replace(/(.*)T(.*)\..*/, "$1 $2")
+function shutdown(name) {
+  return () => {
+    log(`${name} signal received`)
+    server.close(() => {
+      log("Server closed")
+      process.exit()
+    })
+  }
 }

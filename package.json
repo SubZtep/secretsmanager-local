@@ -5,14 +5,15 @@
   "repository": "github:SubZtep/secretsmanager-local",
   "bugs": "https://github.com/SubZtep/secretsmanager-local/issues",
   "license": "Unlicense",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "build": "docker build -t subztep/secretsmanager-local:0.1.3 . && docker tag subztep/secretsmanager-local:0.1.3 subztep/secretsmanager-local:latest",
+    "dev": "cross-env SERVER_PORT=7000 SECRET_NAME=TestKeyFromTheMock SECRET_STRING={hello:123456} SECRET_VERSION_ID=1.0 SECRET_ARN=arn:aws:iam:mock npm start",
+    "build": "zx builder.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": ">=16 <19"
+    "node": ">=16"
   }
 }
