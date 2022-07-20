@@ -2,6 +2,7 @@ import { createServer } from "node:http"
 
 const {
   SERVER_PORT,
+  HEALTHY_TIMEOUT,
   SECRET_NAME: Name,
   SECRET_STRING: SecretString,
   SECRET_VERSION_ID: VersionId,
@@ -13,11 +14,12 @@ const {
  */
 
 const server = createServer(async (req, res) => {
+  const statusCode = isHealthCheck(req) && Number(HEALTHY_TIMEOUT) > process.uptime() ? 500 : 200
   const response = await generateResponse(req)
-  res.writeHead(200, { "Content-Type": "application/json" })
+
+  res.writeHead(statusCode, { "Content-Type": "application/json" })
   res.end(JSON.stringify(response), () => {
-    console.log("WERE", response)
-    log("RESPONSE", {
+    log(`RESPONSE ${statusCode}`, {
       ...response,
       SecretString: `${SecretString.substring(0, 24)}...`,
     })
@@ -42,7 +44,15 @@ function log(message, ...optionalParams) {
   console.log(message, ...optionalParams)
 }
 
+function isHealthCheck(req) {
+  return req.url === "/health"
+}
+
 async function generateResponse(req) {
+  if (isHealthCheck(req)) {
+    return { status: "UP" }
+  }
+
   const buffers = []
   for await (const chunk of req) {
     buffers.push(chunk)
